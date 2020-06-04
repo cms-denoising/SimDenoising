@@ -2,6 +2,9 @@
 #include "SimDenoising/Calo/interface/EcalStepWatcher.h"
 
 //CMSSW headers
+#include "FWCore/Framework/interface/MakerMacros.h"
+#include "FWCore/PluginManager/interface/ModuleDef.h"
+#include "SimG4Core/Watcher/interface/SimWatcherFactory.h"
 #include "SimG4Core/Notification/interface/BeginOfEvent.h"
 #include "SimG4Core/Notification/interface/BeginOfTrack.h"
 #include "SimG4Core/Notification/interface/EndOfEvent.h"
@@ -72,3 +75,5 @@ void EcalStepWatcher::update(const EndOfEvent* evt) {
 	//fill tree
 	tree_->Fill();
 }
+
+DEFINE_SIMWATCHER(EcalStepWatcher);
