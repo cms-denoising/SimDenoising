@@ -11,7 +11,8 @@ defaults = {
 options = VarParsing("analysis")
 options.register("particle", "electron", VarParsing.multiplicity.singleton, VarParsing.varType.string)
 options.register("mult", 1, VarParsing.multiplicity.singleton, VarParsing.varType.int) # number of particles
-options.register("energy", 1, VarParsing.multiplicity.singleton, VarParsing.varType.float)
+options.register("minenergy", 1, VarParsing.multiplicity.singleton, VarParsing.varType.float)
+options.register("maxenergy", 0, VarParsing.multiplicity.singleton, VarParsing.varType.float)
 options.register("mineta", defaults["mineta"], VarParsing.multiplicity.singleton, VarParsing.varType.float)
 options.register("maxeta", defaults["maxeta"], VarParsing.multiplicity.singleton, VarParsing.varType.float)
 options.register("minphi", defaults["minphi"], VarParsing.multiplicity.singleton, VarParsing.varType.float)
@@ -29,9 +30,10 @@ else: raise ValueError("Unsupported particle: "+options.particle)
 
 # check options
 if options.maxEventsIn==-1: options.maxEventsIn = options.maxEvents
+if options.maxenergy==0.: options.maxenergy = options.minenergy
 
 # basic name definition
-nametmp = options.particle+"_energy"+str(options.energy)+"_mult"+str(options.mult)
+nametmp = options.particle+"_energy"+str(options.minenergy)+("to"+str(options.maxenergy) if options.minenergy!=options.maxenergy else "")+"_mult"+str(options.mult)
 if any([defaults[x] != getattr(options,x) for x in defaults]):
     nametmp = nametmp+"_eta"+str(options.mineta)+"to"+str(options.maxeta)+"_phi"+str(options.minphi)+"to"+str(options.maxphi)
 # gen name definition
