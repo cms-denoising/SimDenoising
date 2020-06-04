@@ -50,9 +50,10 @@ void EcalStepWatcher::update(const G4Step* step) {
 	G4StepPoint* preStepPoint = step->GetPreStepPoint();
 	const G4ThreeVector& hitPoint = preStepPoint->GetPosition();
 	G4VPhysicalVolume* currentPV = preStepPoint->GetPhysicalVolume();
-	const G4String& name = currentPV->GetName();
+	std::string name(currentPV->GetName());
 
-	if(volumes_.find(name)==volumes_.end()) return;
+	std::string subname(name.substr(0,4));
+	if(volumes_.find(subname)==volumes_.end()) return;
 
 	entry_.step_x.push_back(hitPoint.x());
 	entry_.step_y.push_back(hitPoint.y());
