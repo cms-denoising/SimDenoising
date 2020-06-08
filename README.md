@@ -4,12 +4,21 @@ Generate input data from Geant4 in CMSSW for AI denoising
 ## Setup
 
 ```bash
-cmsrel CMSSW_11_0_3
+wget https://raw.githubusercontent.com/kpedro88/SimDenoising/master/setup.sh
+chmod +x setup.sh
+./setup.sh
 cd CMSSW_11_0_3/src
 cmsenv
-git cms-init
-git clone git@github.com:kpedro88/SimDenoising
-scram b -j 4
+```
+
+Setup options:
+```
+-f [fork]           clone from specified fork (default = kpedro88)
+-b [branch]         clone specified branch (default = master)
+-c [version]        use specified CMSSW version (default = CMSSW_11_0_3)
+-a [protocol]       use protocol to clone (default = ssh, alternative = https)
+-j [cores]          run CMSSW compilation on # cores (default = 4)
+-h                  display this message and exit
 ```
 
 ## Running
