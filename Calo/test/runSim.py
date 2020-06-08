@@ -29,8 +29,12 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 # Input source
+inname = options._genname+'.root'
+if len(options.indir)>0: inname = options.indir+"/"+inname
+if len(options.redir)>0 and inname.startswith("/store"): inname = options.redir+inname
+if not inname.startswith("/store") and not inname.startswith("root:"): inname = "file:"+inname
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:'+options._genname+'.root'),
+    fileNames = cms.untracked.vstring(inname),
     secondaryFileNames = cms.untracked.vstring()
 )
 

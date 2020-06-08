@@ -19,7 +19,9 @@ options.register("minphi", defaults["minphi"], VarParsing.multiplicity.singleton
 options.register("maxphi", defaults["maxphi"], VarParsing.multiplicity.singleton, VarParsing.varType.float)
 options.register("maxEventsIn", -1, VarParsing.multiplicity.singleton, VarParsing.varType.int)
 options.register("output", True, VarParsing.multiplicity.singleton, VarParsing.varType.bool)
-options.register("part", 1, VarParsing.multiplicity.singleton, VarParsing.varType.int)
+options.register("part", 0, VarParsing.multiplicity.singleton, VarParsing.varType.int)
+options.register("redir", "", VarParsing.multiplicity.singleton, VarParsing.varType.string)
+options.register("indir", "", VarParsing.multiplicity.singleton, VarParsing.varType.string)
 options.parseArguments()
 
 # choose particle
@@ -37,18 +39,18 @@ if options.maxenergy==0.: options.maxenergy = options.minenergy
 nametmp = options.particle+"_energy"+str(options.minenergy)+("to"+str(options.maxenergy) if options.minenergy!=options.maxenergy else "")+"_mult"+str(options.mult)
 if any([defaults[x] != getattr(options,x) for x in defaults]):
     nametmp = nametmp+"_eta"+str(options.mineta)+("to"+str(options.maxeta) if options.mineta!=options.maxeta else "")+"_phi"+str(options.minphi)+("to"+str(options.maxphi) if options.minphi!=options.maxphi else "")
-nametmp = nametmp+"_part"+str(options.part)
+_partname = "_part"+str(options.part) if options.part>0 else ""
 # gen name definition
-options._genname = "gen_"+nametmp+"_n"+str(options.maxEventsIn)
+options._genname = "gen_"+nametmp+"_n"+str(options.maxEventsIn)+_partname
 # sim name definition
-options._simname = "sim_"+nametmp+"_n"+str(options.maxEvents)
+options._simname = "sim_"+nametmp+"_n"+str(options.maxEvents)+_partname
 # ntuple name definition
-options._ntupname = "ntup_"+nametmp+"_n"+str(options.maxEvents)
+options._ntupname = "ntup_"+nametmp+"_n"+str(options.maxEvents)+_partname
 
 def resetSeeds(process,options):
     # reset all random numbers to ensure statistically distinct but reproducible jobs
     from IOMC.RandomEngine.RandomServiceHelper import RandomNumberServiceHelper
     randHelper = RandomNumberServiceHelper(process.RandomNumberGeneratorService)
     randHelper.resetSeeds(options.maxEvents+options.part)
-    if process.source.type_()=='EmptySource': process.source.firstEvent = cms.untracked.uint32((options.part-1)*options.maxEvents+1)
+    if process.source.type_()=='EmptySource' and options.part>0: process.source.firstEvent = cms.untracked.uint32((options.part-1)*options.maxEvents+1)
     return process
