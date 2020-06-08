@@ -4,3 +4,11 @@ __init__.py
 *.log
 *.json
 *.png
+*.tar.gz
+
+# text files
+*.log
+*.stdout
+*.stderr
+*.condor
+jobExecCondor_*.jdl
