@@ -4,7 +4,7 @@
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
 # with command line options: SingleElectronPt10_pythia8_cfi --python_filename runGen.py --conditions auto:phase1_2018_realistic -n 10 --era Run2_2018 --eventcontent RAWSIM --relval 9000,100 -s GEN --datatier GEN --beamspot Realistic25ns13TeVEarly2018Collision --geometry DB:Extended --no_exec --fileout file:step0.root
 import FWCore.ParameterSet.Config as cms
-from SimDenoising.Calo.optGenSim import options
+from SimDenoising.Calo.optGenSim import options, resetSeeds
 
 from Configuration.Eras.Era_Run2_2018_cff import Run2_2018
 
@@ -110,6 +110,7 @@ process.generator = cms.EDFilter("Pythia8EGun",
     psethack = cms.string('single electron pt 10')
 )
 
+process = resetSeeds(process,options)
 
 # Path and EndPath definitions
 process.generation_step = cms.Path(process.pgen)

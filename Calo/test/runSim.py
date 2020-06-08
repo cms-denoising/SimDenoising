@@ -4,7 +4,7 @@
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
 # with command line options: --python_filename runSim.py --conditions auto:phase1_2018_realistic -n 10 --era Run2_2018 --eventcontent RAWSIM --relval 9000,100 -s SIM --datatier GEN-SIM --beamspot Realistic25ns13TeVEarly2018Collision --geometry DB:Extended --no_exec --filein file:step1.root --fileout file:step1.root
 import FWCore.ParameterSet.Config as cms
-from SimDenoising.Calo.optGenSim import options
+from SimDenoising.Calo.optGenSim import options, resetSeeds
 
 from Configuration.Eras.Era_Run2_2018_cff import Run2_2018
 
@@ -101,6 +101,8 @@ process.TFileService = cms.Service("TFileService",
     fileName = cms.string(options._ntupname+".root"),
     closeFileFast = cms.untracked.bool(True),
 )
+
+process = resetSeeds(process,options)
 
 # Path and EndPath definitions
 process.simulation_step = cms.Path(process.psim)
