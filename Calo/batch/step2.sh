@@ -9,7 +9,7 @@ export STEP=""
 export OPTIND=1
 while [[ $OPTIND -lt $# ]]; do
 	# getopts in silent mode, don't exit on errors
-	getopts ":j:p:o:i:x:S:" opt || status=$?
+	getopts ":j:p:o:i:x:s:" opt || status=$?
 	case "$opt" in
 		j) export JOBNAME=$OPTARG
 		;;
@@ -21,7 +21,7 @@ while [[ $OPTIND -lt $# ]]; do
 		;;
 		x) export REDIR=$OPTARG
 		;;
-		S) export STEP=$OPTARG
+		s) export STEP=$OPTARG
 		;;
 		# keep going if getopts had an error
 		\? | :) OPTIND=$((OPTIND+1))
@@ -39,7 +39,7 @@ echo "STEP:       $STEP"
 echo ""
 
 # link files from CMSSW dir
-ln -fs ${CMSSWVER}/src/SVJ/Production/test/${STEP}
+ln -fs ${CMSSWVER}/src/SimDenoising/Calo/test/${STEP}
 
 # run CMSSW
 ARGS=$(cat args_${JOBNAME}.txt)

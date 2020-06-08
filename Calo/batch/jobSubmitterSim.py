@@ -23,8 +23,8 @@ class jobSubmitterSim(jobSubmitter):
         parser.add_option("-N", "--nParts", dest="nParts", default=1, help="number of parts to process (default = %default)")
         parser.add_option("-i", "--indir", dest="indir", default="", help="input file directory (LFN) (default = %default)")
         parser.add_option("-d", "--redir", dest="redir", default="root://cmseos.fnal.gov/", help="input file redirector (default = %default)")
-        parser.add_option("-S", "--step", dest="step", default="", help="step ("+' '.join(self.allowed_steps)+") (default = %default)")
-        parser.add_option("-A", "--args", dest="args", default="", help="common args to use for all jobs (default = %default)")
+        parser.add_option("-S", "--step", dest="step", default="", help="step ("+', '.join(self.allowed_steps)+") (default = %default)")
+        parser.add_option("-A", "--args", dest="args", default="", help="common args to use for all jobs, should include maxEvents (default = %default)")
 
     def checkExtraOptions(self,options,parser):
         super(jobSubmitterSim,self).checkExtraOptions(options,parser)
@@ -62,8 +62,7 @@ class jobSubmitterSim(jobSubmitter):
             job.nums.append(iActualJob)
 
         # append queue comment
-        job.queue = '-queue '+str(job.njobs)
-        if self.firstPart>1: job.queue = '-queue "Process in '+','.join(map(str,job.nums))+'"'
+        job.queue = '-queue "Process in '+','.join(map(str,job.nums))+'"'
 
         # store protojob
         self.protoJobs.append(job)
@@ -73,5 +72,5 @@ class jobSubmitterSim(jobSubmitter):
         job.patterns.update([
             ("JOBNAME",job.name+"_part$(Process)_$(Cluster)"),
             ("EXTRAINPUTS","input/args_"+job.name+".txt"),
-            ("EXTRAARGS","-j "+job.name+" -p $(Process) -o "+self.output+" -S "+self.step_files[self.step]+(" -i "+self.indir if len(self.indir)>0 else "")+(" -x "+self.redir if len(self.redir)>0 else "")),
+            ("EXTRAARGS","-j "+job.name+" -p $(Process) -o "+self.output+" -s "+self.step_files[self.step]+(" -i "+self.indir if len(self.indir)>0 else "")+(" -x "+self.redir if len(self.redir)>0 else "")),
         ])
