@@ -9,6 +9,7 @@
 
 //ROOT headers
 #include <TTree.h>
+#include <TH2F.h>
 
 //STL headers
 #include <vector>
@@ -49,6 +50,16 @@ class EcalStepWatcher : public SimWatcher,
 		edm::Service<TFileService> fs_;
 		TTree* tree_;
 		SimNtuple entry_;
+		TH2 *h2_;
+
+		int xbins = 100;
+                int ybins = 100;
+                // any way to get these from geometry?
+                int xmin = 1300;
+                int xmax = 1500;
+                int ymin = -5;
+                int ymax = 5;
+		bool image = false;
 };
 
 #endif

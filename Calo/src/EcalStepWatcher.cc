@@ -23,27 +23,35 @@ EcalStepWatcher::EcalStepWatcher(const edm::ParameterSet& iConfig)
 	//store list of volumes to watch
 	const auto& vols = iConfig.getParameter<std::vector<std::string>>("volumes");
 	volumes_.insert(vols.begin(),vols.end());
+	
+	image = iConfig.getParameter<bool>("image_only");
+	
+	
+	  //create output tree
+	  tree_ = fs_->make<TTree>("tree","tree");
 
-	//create output tree
-	tree_ = fs_->make<TTree>("tree","tree");
+	  //assign branches
+	  tree_->Branch("prim_pt",&entry_.prim_pt,"prim_pt/D");
+	  tree_->Branch("prim_eta",&entry_.prim_eta,"prim_eta/D");
+	  tree_->Branch("prim_phi",&entry_.prim_phi,"prim_phi/D");
+	  tree_->Branch("prim_E",&entry_.prim_E,"prim_E/D");
+	  tree_->Branch("prim_id",&entry_.prim_id,"prim_id/I");
+	  tree_->Branch("step_x" , "vector<double>", &entry_.step_x, 32000, 0);
+	  tree_->Branch("step_y" , "vector<double>", &entry_.step_y, 32000, 0);
+	  tree_->Branch("step_z" , "vector<double>", &entry_.step_z, 32000, 0);
+	  tree_->Branch("step_E" , "vector<double>", &entry_.step_E, 32000, 0);
+	  tree_->Branch("step_t" , "vector<double>", &entry_.step_t, 32000, 0);
+	
 
-	//assign branches
-	tree_->Branch("prim_pt",&entry_.prim_pt,"prim_pt/D");
-	tree_->Branch("prim_eta",&entry_.prim_eta,"prim_eta/D");
-	tree_->Branch("prim_phi",&entry_.prim_phi,"prim_phi/D");
-	tree_->Branch("prim_E",&entry_.prim_E,"prim_E/D");
-	tree_->Branch("prim_id",&entry_.prim_id,"prim_id/I");
-	tree_->Branch("step_x" , "vector<double>", &entry_.step_x, 32000, 0);
-	tree_->Branch("step_y" , "vector<double>", &entry_.step_y, 32000, 0);
-	tree_->Branch("step_z" , "vector<double>", &entry_.step_z, 32000, 0);
-	tree_->Branch("step_E" , "vector<double>", &entry_.step_E, 32000, 0);
-	tree_->Branch("step_t" , "vector<double>", &entry_.step_t, 32000, 0);
-
+	
+	  h2_ = fs_->make<TH2F>("h2", "histogram", xbins, xmin, xmax, ybins, ymin, ymax);
+	
 }
 
-void EcalStepWatcher::update(const BeginOfEvent* evt) {
-	//reset branches
+void EcalStepWatcher::update(const BeginOfEvent* evt) {  
+        //reset branches
 	entry_ = SimNtuple();
+  
 }
 
 void EcalStepWatcher::update(const G4Step* step) {
@@ -51,18 +59,24 @@ void EcalStepWatcher::update(const G4Step* step) {
 	const G4ThreeVector& hitPoint = preStepPoint->GetPosition();
 	G4VPhysicalVolume* currentPV = preStepPoint->GetPhysicalVolume();
 	std::string name(currentPV->GetName());
+	
+	  std::string subname(name.substr(0,4));
+	  if(volumes_.find(subname)==volumes_.end()) return;
 
-	std::string subname(name.substr(0,4));
-	if(volumes_.find(subname)==volumes_.end()) return;
+	  entry_.step_x.push_back(hitPoint.x());
+	  entry_.step_y.push_back(hitPoint.y());
+	  entry_.step_z.push_back(hitPoint.z());
+	  entry_.step_E.push_back(step->GetTotalEnergyDeposit());
+	  entry_.step_t.push_back(step->GetTrack()->GetGlobalTime());
+	
 
-	entry_.step_x.push_back(hitPoint.x());
-	entry_.step_y.push_back(hitPoint.y());
-	entry_.step_z.push_back(hitPoint.z());
-	entry_.step_E.push_back(step->GetTotalEnergyDeposit());
-	entry_.step_t.push_back(step->GetTrack()->GetGlobalTime());
+	
+	  h2_->Fill(hitPoint.x(), hitPoint.y(), step->GetTotalEnergyDeposit());
+	
 }
 
 void EcalStepWatcher::update(const EndOfEvent* evt) {
+  
 	//assume single particle gun
 	G4PrimaryParticle* prim = (*evt)()->GetPrimaryVertex(0)->GetPrimary(0);
 	TLorentzVector vprim;
@@ -75,6 +89,8 @@ void EcalStepWatcher::update(const EndOfEvent* evt) {
 
 	//fill tree
 	tree_->Fill();
+  
+	
 }
 
 DEFINE_SIMWATCHER(EcalStepWatcher);
