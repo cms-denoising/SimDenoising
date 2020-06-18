@@ -9,6 +9,7 @@
 
 //ROOT headers
 #include <TTree.h>
+#include <TH2F.h>
 
 //STL headers
 #include <vector>
@@ -33,7 +34,8 @@ class EcalStepWatcher : public SimWatcher,
 		struct SimNtuple {
 			double prim_pt, prim_eta, prim_phi, prim_E;
 			int prim_id;
-			std::vector<double> step_x, step_y, step_z, step_t, step_E;
+		  std::vector<double> step_x, step_y, step_z, step_t, step_E, image;
+	                TH2F * h2;
 		};
 
 	private:
@@ -49,6 +51,16 @@ class EcalStepWatcher : public SimWatcher,
 		edm::Service<TFileService> fs_;
 		TTree* tree_;
 		SimNtuple entry_;
+		
+		TH2F * histogram;
+		int xbins = 100;
+                int ybins = 100;
+                // any way to get these from geometry?
+                int xmin = 1300;
+                int xmax = 1500;
+                int ymin = -5;
+                int ymax = 5;
+		bool image = false;
 };
 
 #endif
