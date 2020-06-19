@@ -98,6 +98,13 @@ process.g4SimHits.Watchers = cms.VPSet(
     cms.PSet(
         type = cms.string('EcalStepWatcher'),
         volumes = cms.vstring("EBRY","EFRY"),
+        image_only = cms.bool(options.imageonly),
+        xmin = cms.int32(options.xmin),
+        xmax = cms.int32(options.xmax),
+        ymin = cms.int32(options.ymin),
+        ymax = cms.int32(options.ymax),
+        xbins = cms.int32(options.xbins),
+        ybins = cms.int32(options.ybins),
     ),
 )
 
