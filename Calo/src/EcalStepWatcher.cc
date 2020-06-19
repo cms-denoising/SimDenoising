@@ -24,9 +24,15 @@ EcalStepWatcher::EcalStepWatcher(const edm::ParameterSet& iConfig)
 	const auto& vols = iConfig.getParameter<std::vector<std::string>>("volumes");
 	volumes_.insert(vols.begin(),vols.end());
 	
-	//switch to leave out step information vectors
+	//get parameters
 	image_only = iConfig.getParameter<bool>("image_only");
-	
+	xbins = iConfig.getParameter<int>("xbins");
+	ybins = iConfig.getParameter<int>("ybins");
+	xmin = iConfig.getParameter<int>("xmin");
+	xmax = iConfig.getParameter<int>("xmax");
+	ymin = iConfig.getParameter<int>("ymin");
+	ymax = iConfig.getParameter<int>("ymax");
+
 	//create output tree
 	tree_ = fs_->make<TTree>("tree","tree");
 
@@ -46,13 +52,16 @@ EcalStepWatcher::EcalStepWatcher(const edm::ParameterSet& iConfig)
 	}
 	else {
 	    tree_->Branch("bin_weights", "vector<double>", &entry_.bin_weights, 32000, 0);
+	    h2 = new TH2F("h", "hist", xbins, xmin, xmax, ybins, ymin, ymax);
 	}
 }
 
 void EcalStepWatcher::update(const BeginOfEvent* evt) {  
         //reset branches
   	entry_ = SimNtuple();
-  	entry_.h2 = new TH2F("h", "hist", xbins, xmin, xmax, ybins, ymin, ymax);
+  	if (image_only){
+	    h2->Reset("ICESM");
+	}
 }
 
 void EcalStepWatcher::update(const G4Step* step) {
@@ -70,7 +79,7 @@ void EcalStepWatcher::update(const G4Step* step) {
 	    entry_.step_t.push_back(step->GetTrack()->GetGlobalTime());
       	}
 	else {
-	    entry_.h2->Fill(hitPoint.x(), hitPoint.y(), step->GetTotalEnergyDeposit());
+	    h2->Fill(hitPoint.x(), hitPoint.y(), step->GetTotalEnergyDeposit());
 	}
 }
 
@@ -91,9 +100,10 @@ void EcalStepWatcher::update(const EndOfEvent* evt) {
 	if (image_only) {
 	    // get bin weights from TH2 and store in tree
 	    Int_t x, y;
+	    entry_.bin_weights.reserve(xbins*ybins);
 	    for (x=0; x < xbins; x++){
 	        for (y=0; y < ybins; y++){
-		  entry_.bin_weights.push_back(entry_.h2->GetBinContent(x, y));
+		  entry_.bin_weights.push_back(h2->GetBinContent(x, y));
 		}
 	    }
 	}

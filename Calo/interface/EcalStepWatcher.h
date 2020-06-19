@@ -35,7 +35,6 @@ class EcalStepWatcher : public SimWatcher,
 			double prim_pt, prim_eta, prim_phi, prim_E;
 			int prim_id;
 		        std::vector<double> step_x, step_y, step_z, step_t, step_E, bin_weights;
-	                TH2F * h2;
 		};
 
 	private:
@@ -51,12 +50,13 @@ class EcalStepWatcher : public SimWatcher,
 		edm::Service<TFileService> fs_;
 		TTree* tree_;
 		SimNtuple entry_;		
-      		int xbins = 100;
-                int ybins = 100;
-                int xmin = 1300;
-                int xmax = 1500;
-                int ymin = -5;
-                int ymax = 5;
+      		TH2F * h2;
+		int xbins;
+                int ybins;
+                int xmin;
+                int xmax;
+                int ymin;
+                int ymax;
 		bool image_only;
 };
 

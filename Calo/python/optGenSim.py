@@ -22,6 +22,14 @@ options.register("output", True, VarParsing.multiplicity.singleton, VarParsing.v
 options.register("part", 0, VarParsing.multiplicity.singleton, VarParsing.varType.int)
 options.register("redir", "", VarParsing.multiplicity.singleton, VarParsing.varType.string)
 options.register("indir", "", VarParsing.multiplicity.singleton, VarParsing.varType.string)
+options.register("xmin", 1300, VarParsing.multiplicity.singleton, VarParsing.varType.int)
+options.register("xmax", 1500, VarParsing.multiplicity.singleton, VarParsing.varType.int)
+options.register("ymin", -5, VarParsing.multiplicity.singleton, VarParsing.varType.int)
+options.register("ymax", 5, VarParsing.multiplicity.singleton, VarParsing.varType.int)
+options.register("xbins", 100, VarParsing.multiplicity.singleton, VarParsing.varType.int)
+options.register("ybins", 100, VarParsing.multiplicity.singleton, VarParsing.varType.int)
+options.register("imageonly", True, VarParsing.multiplicity.singleton, VarParsing.varType.bool)
+
 options.parseArguments()
 
 # choose particle
