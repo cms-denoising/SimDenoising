@@ -28,7 +28,7 @@ options.register("ymin", -5, VarParsing.multiplicity.singleton, VarParsing.varTy
 options.register("ymax", 5, VarParsing.multiplicity.singleton, VarParsing.varType.int)
 options.register("xbins", 100, VarParsing.multiplicity.singleton, VarParsing.varType.int)
 options.register("ybins", 100, VarParsing.multiplicity.singleton, VarParsing.varType.int)
-options.register("imageonly", True, VarParsing.multiplicity.singleton, VarParsing.varType.bool)
+options.register("imageonly", False, VarParsing.multiplicity.singleton, VarParsing.varType.bool)
 
 options.parseArguments()
 
