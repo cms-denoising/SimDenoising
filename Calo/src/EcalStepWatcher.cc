@@ -100,9 +100,10 @@ void EcalStepWatcher::update(const EndOfEvent* evt) {
 	if (image_only) {
 	    // get bin weights from TH2 and store in tree
 	    Int_t x, y;
+	    h2->ClearUnderflowAndOverflow();
 	    entry_.bin_weights.reserve(xbins*ybins);
-	    for (x=0; x < xbins; x++){
-	        for (y=0; y < ybins; y++){
+	    for (x=1; x <= xbins; x++){
+	        for (y=1; y <= ybins; y++){
 		  entry_.bin_weights.push_back(h2->GetBinContent(x, y));
 		}
 	    }
