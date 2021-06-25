@@ -42,6 +42,12 @@ EcalStepWatcher::EcalStepWatcher(const edm::ParameterSet& iConfig)
 	tree_->Branch("prim_phi",&entry_.prim_phi,"prim_phi/D");
 	tree_->Branch("prim_E",&entry_.prim_E,"prim_E/D");
 	tree_->Branch("prim_id",&entry_.prim_id,"prim_id/I");
+	tree_->Branch("xbins",&xbins,"xbins/I");
+	tree_->Branch("ybins",&ybins,"ybins/I");
+	tree_->Branch("xmin",&xmin,"xmin/I");
+	tree_->Branch("xmax",&xmax,"xmax/I");
+	tree_->Branch("ymin",&ymin,"ymin/I");
+	tree_->Branch("ymax",&ymax,"ymax/I");
 	if (!image_only){
 	    tree_->Branch("step_t" , "vector<double>", &entry_.step_t, 32000, 0);
 	    tree_->Branch("step_x" , "vector<double>", &entry_.step_x, 32000, 0);
@@ -52,6 +58,12 @@ EcalStepWatcher::EcalStepWatcher(const edm::ParameterSet& iConfig)
 	}
 	else {
 	    tree_->Branch("bin_weights", "vector<double>", &entry_.bin_weights, 32000, 0);
+	    tree_->Branch("xbins",&xbins,"xbins/I");
+            tree_->Branch("ybins",&ybins,"ybins/I");
+            tree_->Branch("xmin",&xmin,"xmin/I");
+            tree_->Branch("xmax",&xmax,"xmax/I");
+            tree_->Branch("ymin",&ymin,"ymin/I");
+            tree_->Branch("ymax",&ymax,"ymax/I");
 	    h2 = new TH2F("h", "hist", xbins, xmin, xmax, ybins, ymin, ymax);
 	}
 }
@@ -95,7 +107,6 @@ void EcalStepWatcher::update(const EndOfEvent* evt) {
 	entry_.prim_phi = vprim.Phi();
 	entry_.prim_E = vprim.E();
 	entry_.prim_id = prim->GetPDGcode();
-	
 
 	if (image_only) {
 	    // get bin weights from TH2 and store in tree
