@@ -127,6 +127,8 @@ associatePatAlgosToolsTask(process)
 
 
 # Customisation from command line
+for p in options._params:
+    process = p.apply(process)
 
 # Add early deletion of temporary data products to reduce peak memory need
 from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete
