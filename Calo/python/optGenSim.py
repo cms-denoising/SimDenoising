@@ -8,35 +8,38 @@ defaults = {
     "maxphi": 3.14159265359,
 }
 
-options = VarParsing("analysis")
-options.register("particle", "electron", VarParsing.multiplicity.singleton, VarParsing.varType.string)
-options.register("mult", 1, VarParsing.multiplicity.singleton, VarParsing.varType.int) # number of particles
-options.register("minenergy", 1, VarParsing.multiplicity.singleton, VarParsing.varType.float)
-options.register("maxenergy", 0, VarParsing.multiplicity.singleton, VarParsing.varType.float)
-options.register("mineta", defaults["mineta"], VarParsing.multiplicity.singleton, VarParsing.varType.float)
-options.register("maxeta", defaults["maxeta"], VarParsing.multiplicity.singleton, VarParsing.varType.float)
-options.register("minphi", defaults["minphi"], VarParsing.multiplicity.singleton, VarParsing.varType.float)
-options.register("maxphi", defaults["maxphi"], VarParsing.multiplicity.singleton, VarParsing.varType.float)
-options.register("maxEventsIn", -1, VarParsing.multiplicity.singleton, VarParsing.varType.int)
-options.register("output", True, VarParsing.multiplicity.singleton, VarParsing.varType.bool)
-options.register("part", 0, VarParsing.multiplicity.singleton, VarParsing.varType.int)
-options.register("redir", "", VarParsing.multiplicity.singleton, VarParsing.varType.string)
-options.register("indir", "", VarParsing.multiplicity.singleton, VarParsing.varType.string)
-options.register("xmin", 1300, VarParsing.multiplicity.singleton, VarParsing.varType.int)
-options.register("xmax", 1500, VarParsing.multiplicity.singleton, VarParsing.varType.int)
-options.register("ymin", -5, VarParsing.multiplicity.singleton, VarParsing.varType.int)
-options.register("ymax", 5, VarParsing.multiplicity.singleton, VarParsing.varType.int)
-options.register("xbins", 100, VarParsing.multiplicity.singleton, VarParsing.varType.int)
-options.register("ybins", 100, VarParsing.multiplicity.singleton, VarParsing.varType.int)
-options.register("imageonly", False, VarParsing.multiplicity.singleton, VarParsing.varType.bool)
+particles = {
+    "electron": 11,
+    "positron": -11,
+    "photon": 22,
+}
+
+options = VarParsing()
+options.register("particle", "electron", VarParsing.multiplicity.singleton, VarParsing.varType.string, "particle to generate (choices: {})".format(','.join(sorted(particles))))
+options.register("mult", 1, VarParsing.multiplicity.singleton, VarParsing.varType.int, "number of particles to generate") # number of particles
+options.register("minenergy", 1, VarParsing.multiplicity.singleton, VarParsing.varType.float, "minimum energy to generate")
+options.register("maxenergy", 0, VarParsing.multiplicity.singleton, VarParsing.varType.float, "maximum energy to generate (0: max = min)")
+options.register("mineta", defaults["mineta"], VarParsing.multiplicity.singleton, VarParsing.varType.float, "minimum eta to generate")
+options.register("maxeta", defaults["maxeta"], VarParsing.multiplicity.singleton, VarParsing.varType.float, "maximum eta to generate")
+options.register("minphi", defaults["minphi"], VarParsing.multiplicity.singleton, VarParsing.varType.float, "minimum phi to generate")
+options.register("maxphi", defaults["maxphi"], VarParsing.multiplicity.singleton, VarParsing.varType.float, "maximum phi to generate")
+options.register("maxEvents", -1, VarParsing.multiplicity.singleton, VarParsing.varType.int, "Number of events to process (-1 for all)")
+options.register("maxEventsIn", -1, VarParsing.multiplicity.singleton, VarParsing.varType.int, "maximum number of input events (if different from maxEvents)")
+options.register("part", 0, VarParsing.multiplicity.singleton, VarParsing.varType.int, "part number")
+options.register("redir", "", VarParsing.multiplicity.singleton, VarParsing.varType.string, "xrootd redirector")
+options.register("indir", "", VarParsing.multiplicity.singleton, VarParsing.varType.string, "input directory")
+options.register("xmin", 1300, VarParsing.multiplicity.singleton, VarParsing.varType.int, "minimum x coordinate for image")
+options.register("xmax", 1500, VarParsing.multiplicity.singleton, VarParsing.varType.int, "maximum x coordinate for image")
+options.register("ymin", -5, VarParsing.multiplicity.singleton, VarParsing.varType.int, "minimum y coordinate for image")
+options.register("ymax", 5, VarParsing.multiplicity.singleton, VarParsing.varType.int, "maximum y coordinate for image")
+options.register("xbins", 100, VarParsing.multiplicity.singleton, VarParsing.varType.int, "number of x bins for image")
+options.register("ybins", 100, VarParsing.multiplicity.singleton, VarParsing.varType.int, "number of y bis for image")
+options.register("imageonly", False, VarParsing.multiplicity.singleton, VarParsing.varType.bool, "only save image (not steps) in ntup tree")
 
 options.parseArguments()
 
 # choose particle
-options._pdgid = 0
-if options.particle=="electron": options._pdgid = 11
-elif options.particle=="positron": options._pdgid = -11
-elif options.particle=="photon": options._pdgid = 22
+if options.particle in particles: options._pdgid = particles[options.particle]
 else: raise ValueError("Unsupported particle: "+options.particle)
 
 # check options
