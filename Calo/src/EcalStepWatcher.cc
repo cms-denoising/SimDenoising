@@ -43,30 +43,30 @@ EcalStepWatcher::EcalStepWatcher(const edm::ParameterSet& iConfig)
 	tree_->Branch("prim_E",&entry_.prim_E,"prim_E/D");
 	tree_->Branch("prim_id",&entry_.prim_id,"prim_id/I");
 	if (!image_only){
-	    tree_->Branch("step_t" , "vector<double>", &entry_.step_t, 32000, 0);
-	    tree_->Branch("step_x" , "vector<double>", &entry_.step_x, 32000, 0);
-	    tree_->Branch("step_y" , "vector<double>", &entry_.step_y, 32000, 0);
-	    tree_->Branch("step_z" , "vector<double>", &entry_.step_z, 32000, 0);
-	    tree_->Branch("step_E" , "vector<double>", &entry_.step_E, 32000, 0);
-	    tree_->Branch("step_t" , "vector<double>", &entry_.step_t, 32000, 0);
+		tree_->Branch("step_t" , "vector<double>", &entry_.step_t, 32000, 0);
+		tree_->Branch("step_x" , "vector<double>", &entry_.step_x, 32000, 0);
+		tree_->Branch("step_y" , "vector<double>", &entry_.step_y, 32000, 0);
+		tree_->Branch("step_z" , "vector<double>", &entry_.step_z, 32000, 0);
+		tree_->Branch("step_E" , "vector<double>", &entry_.step_E, 32000, 0);
+		tree_->Branch("step_t" , "vector<double>", &entry_.step_t, 32000, 0);
 	}
 	else {
-	    tree_->Branch("bin_weights", "vector<double>", &entry_.bin_weights, 32000, 0);
-	    tree_->Branch("xbins",&xbins,"xbins/I");
-            tree_->Branch("ybins",&ybins,"ybins/I");
-            tree_->Branch("xmin",&xmin,"xmin/I");
-            tree_->Branch("xmax",&xmax,"xmax/I");
-            tree_->Branch("ymin",&ymin,"ymin/I");
-            tree_->Branch("ymax",&ymax,"ymax/I");
-	    h2 = new TH2F("h", "hist", xbins, xmin, xmax, ybins, ymin, ymax);
+		tree_->Branch("bin_weights", "vector<double>", &entry_.bin_weights, 32000, 0);
+		tree_->Branch("xbins",&xbins,"xbins/I");
+		tree_->Branch("ybins",&ybins,"ybins/I");
+		tree_->Branch("xmin",&xmin,"xmin/I");
+		tree_->Branch("xmax",&xmax,"xmax/I");
+		tree_->Branch("ymin",&ymin,"ymin/I");
+		tree_->Branch("ymax",&ymax,"ymax/I");
+		h2 = new TH2F("h", "hist", xbins, xmin, xmax, ybins, ymin, ymax);
 	}
 }
 
 void EcalStepWatcher::update(const BeginOfEvent* evt) {  
-        //reset branches
-  	entry_ = SimNtuple();
-  	if (image_only){
-	    h2->Reset("ICESM");
+	//reset branches
+	entry_ = SimNtuple();
+	if (image_only){
+		h2->Reset("ICESM");
 	}
 }
 
@@ -78,40 +78,40 @@ void EcalStepWatcher::update(const G4Step* step) {
 	std::string subname(name.substr(0,4));
 	if(volumes_.find(subname)==volumes_.end()) return;
 	if (!image_only){
-	    entry_.step_x.push_back(hitPoint.x());
-	    entry_.step_y.push_back(hitPoint.y());
-	    entry_.step_z.push_back(hitPoint.z());
-	    entry_.step_E.push_back(step->GetTotalEnergyDeposit()); 
-	    entry_.step_t.push_back(step->GetTrack()->GetGlobalTime());
-      	}
+		entry_.step_x.push_back(hitPoint.x());
+		entry_.step_y.push_back(hitPoint.y());
+		entry_.step_z.push_back(hitPoint.z());
+		entry_.step_E.push_back(step->GetTotalEnergyDeposit()); 
+		entry_.step_t.push_back(step->GetTrack()->GetGlobalTime());
+	}
 	else {
-	    h2->Fill(hitPoint.x(), hitPoint.y(), step->GetTotalEnergyDeposit());
+		h2->Fill(hitPoint.x(), hitPoint.y(), step->GetTotalEnergyDeposit());
 	}
 }
 
 void EcalStepWatcher::update(const EndOfEvent* evt) {
- 
+
 	//assume single particle gun
 	G4PrimaryParticle* prim = (*evt)()->GetPrimaryVertex(0)->GetPrimary(0);
 	TLorentzVector vprim;
 	vprim.SetPxPyPzE(prim->GetPx(),prim->GetPy(),prim->GetPz(),prim->GetTotalEnergy());
 	
-        entry_.prim_pt = vprim.Pt();
+	entry_.prim_pt = vprim.Pt();
 	entry_.prim_eta = vprim.Eta();
 	entry_.prim_phi = vprim.Phi();
 	entry_.prim_E = vprim.E();
 	entry_.prim_id = prim->GetPDGcode();
 
 	if (image_only) {
-	    // get bin weights from TH2 and store in tree
-	    Int_t x, y;
-	    h2->ClearUnderflowAndOverflow();
-	    entry_.bin_weights.reserve(xbins*ybins);
-	    for (x=1; x <= xbins; x++){
-	        for (y=1; y <= ybins; y++){
-		  entry_.bin_weights.push_back(h2->GetBinContent(x, y));
+		// get bin weights from TH2 and store in tree
+		Int_t x, y;
+		h2->ClearUnderflowAndOverflow();
+		entry_.bin_weights.reserve(xbins*ybins);
+		for (x=1; x <= xbins; x++){
+			for (y=1; y <= ybins; y++){
+				entry_.bin_weights.push_back(h2->GetBinContent(x, y));
+			}
 		}
-	    }
 	}
 
 	//fill tree
