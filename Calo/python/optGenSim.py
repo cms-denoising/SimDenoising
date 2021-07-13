@@ -38,6 +38,7 @@ options.register("ymax", 5, VarParsing.multiplicity.singleton, VarParsing.varTyp
 options.register("xbins", 100, VarParsing.multiplicity.singleton, VarParsing.varType.int, "number of x bins for image")
 options.register("ybins", 100, VarParsing.multiplicity.singleton, VarParsing.varType.int, "number of y bis for image")
 options.register("imageonly", False, VarParsing.multiplicity.singleton, VarParsing.varType.bool, "only save image (not steps) in ntup tree")
+options.register("resetrandom", True, VarParsing.multiplicity.singleton, VarParsing.varType.bool, "reset random number generator state for each event")
 options.register("paramNames", "", VarParsing.multiplicity.list, VarParsing.varType.string, "Geant4 parameters to modify (choices: {})".format(','.join(sorted(params))))
 options.register("paramValues", "", VarParsing.multiplicity.list, VarParsing.varType.float, "values for modified Geant4 parameters")
 
