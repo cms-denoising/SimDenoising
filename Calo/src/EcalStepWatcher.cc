@@ -2,6 +2,7 @@
 #include "SimDenoising/Calo/interface/EcalStepWatcher.h"
 
 //CMSSW headers
+#include "DataFormats/Math/interface/LorentzVector.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/PluginManager/interface/ModuleDef.h"
 #include "FWCore/Utilities/interface/RandomNumberGenerator.h"
@@ -18,11 +19,10 @@
 #include "G4SDManager.hh"
 #include "G4Step.hh"
 
-//ROOT headers
-#include <TLorentzVector.h>
-
 //STL headers
 #include <algorithm>
+
+typedef math::XYZTLorentzVector LorentzVector;
 
 namespace {
 //modifiable class w/ same layout as edm::StreamID
@@ -131,13 +131,12 @@ void EcalStepWatcher::update(const EndOfEvent* evt) {
 
 	//assume single particle gun
 	G4PrimaryParticle* prim = (*evt)()->GetPrimaryVertex(0)->GetPrimary(0);
-	TLorentzVector vprim;
-	vprim.SetPxPyPzE(prim->GetPx(),prim->GetPy(),prim->GetPz(),prim->GetTotalEnergy());
-	
-	entry_.prim_pt = vprim.Pt();
-	entry_.prim_eta = vprim.Eta();
-	entry_.prim_phi = vprim.Phi();
-	entry_.prim_E = vprim.E();
+	LorentzVector vprim(prim->GetPx(),prim->GetPy(),prim->GetPz(),prim->GetTotalEnergy());
+
+	entry_.prim_pt = vprim.pt();
+	entry_.prim_eta = vprim.eta();
+	entry_.prim_phi = vprim.phi();
+	entry_.prim_E = vprim.energy();
 	entry_.prim_id = prim->GetPDGcode();
 
 	if (image_only) {
