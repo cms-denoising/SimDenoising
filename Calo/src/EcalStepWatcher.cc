@@ -4,6 +4,9 @@
 //CMSSW headers
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/PluginManager/interface/ModuleDef.h"
+#include "FWCore/Utilities/interface/RandomNumberGenerator.h"
+#include "FWCore/Utilities/interface/StreamID.h"
+#include "SimDataFormats/RandomEngine/interface/RandomEngineState.h"
 #include "SimG4Core/Watcher/interface/SimWatcherFactory.h"
 #include "SimG4Core/Notification/interface/BeginOfEvent.h"
 #include "SimG4Core/Notification/interface/BeginOfTrack.h"
@@ -18,6 +21,19 @@
 //ROOT headers
 #include <TLorentzVector.h>
 
+//STL headers
+#include <algorithm>
+
+namespace {
+//modifiable class w/ same layout as edm::StreamID
+class FakeStreamID {
+public:
+	FakeStreamID(unsigned int value) : value_(value) {}
+private:
+	unsigned int value_;
+};
+}
+
 EcalStepWatcher::EcalStepWatcher(const edm::ParameterSet& iConfig)
 {
 	//store list of volumes to watch
@@ -25,6 +41,7 @@ EcalStepWatcher::EcalStepWatcher(const edm::ParameterSet& iConfig)
 	volumes_.insert(vols.begin(),vols.end());
 	
 	//get parameters
+	reset_random = iConfig.getParameter<bool>("reset_random");
 	image_only = iConfig.getParameter<bool>("image_only");
 	xbins = iConfig.getParameter<int>("xbins");
 	ybins = iConfig.getParameter<int>("ybins");
@@ -63,6 +80,27 @@ EcalStepWatcher::EcalStepWatcher(const edm::ParameterSet& iConfig)
 }
 
 void EcalStepWatcher::update(const BeginOfEvent* evt) {  
+	//reset random number generator
+	if(reset_random){
+		edm::Service<edm::RandomNumberGenerator> rng;
+		//mockup of a stream ID: assume single thread
+		FakeStreamID fid(0);
+		edm::StreamID* sid(reinterpret_cast<edm::StreamID*>(&fid));
+		//make a copy of previous cache
+		std::vector<RandomEngineState> cache = rng->getEventCache(*sid);
+		//increment all seeds for relevant rng
+		for(auto& state : cache){
+			if(state.getLabel() == "g4SimHits"){
+				auto seed_tmp = state.getSeed();
+				std::for_each(seed_tmp.begin(), seed_tmp.end(), [](auto& n){ n++; });
+				state.setSeed(seed_tmp);
+				break;
+			}
+		}
+		//force service to restore state from modified cache
+		rng->setEventCache(*sid,cache);
+	}
+
 	//reset branches
 	entry_ = SimNtuple();
 	if (image_only){

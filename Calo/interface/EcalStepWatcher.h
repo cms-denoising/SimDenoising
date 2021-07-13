@@ -58,6 +58,7 @@ class EcalStepWatcher : public SimWatcher,
 		int ymin;
 		int ymax;
 		bool image_only;
+		bool reset_random;
 };
 
 #endif
