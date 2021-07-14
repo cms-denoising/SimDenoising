@@ -111,6 +111,10 @@ void EcalStepWatcher::update(const BeginOfEvent* evt) {
 	FakeStreamID fid(0);
 	edm::StreamID* sid(reinterpret_cast<edm::StreamID*>(&fid));
 	edm::Service<edm::RandomNumberGenerator> rng;
+	auto state_tmp = G4Random::getTheEngine()->put();
+	std::cout << "state: ";
+	std::for_each(state_tmp.begin(), state_tmp.end(), [](auto n){ std::cout << n << ", "; });
+	std::cout << std::endl;
 	std::cout << "random (begin): " << CLHEP::RandFlat::shoot(&(rng->getEngine(*sid))) << ", " << CLHEP::RandFlat::shoot(G4Random::getTheEngine()) << std::endl;
 
 	//reset branches
