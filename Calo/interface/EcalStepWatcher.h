@@ -34,7 +34,7 @@ class EcalStepWatcher : public SimWatcher,
 		struct SimNtuple {
 			double prim_pt, prim_eta, prim_phi, prim_E;
 			int prim_id;
-		        std::vector<double> step_x, step_y, step_z, step_t, step_E, bin_weights;
+			std::vector<double> step_x, step_y, step_z, step_t, step_E, bin_weights;
 		};
 
 	private:
@@ -49,15 +49,17 @@ class EcalStepWatcher : public SimWatcher,
 		std::unordered_set<std::string> volumes_;
 		edm::Service<TFileService> fs_;
 		TTree* tree_;
-		SimNtuple entry_;		
-      		TH2F * h2;
+		SimNtuple entry_;
+		TH2F * h2;
 		int xbins;
-                int ybins;
-                int xmin;
-                int xmax;
-                int ymin;
-                int ymax;
+		int ybins;
+		int xmin;
+		int xmax;
+		int ymin;
+		int ymax;
 		bool image_only;
+		bool reset_random;
+		std::vector<std::uint32_t> orig_seeds;
 };
 
 #endif
