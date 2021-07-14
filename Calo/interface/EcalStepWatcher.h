@@ -4,6 +4,7 @@
 //CMSSW headers
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h" 
+#include "SimDataFormats/RandomEngine/interface/RandomEngineState.h"
 #include "SimG4Core/Notification/interface/Observer.h"
 #include "SimG4Core/Watcher/interface/SimWatcher.h"
 
@@ -59,7 +60,7 @@ class EcalStepWatcher : public SimWatcher,
 		int ymax;
 		bool image_only;
 		bool reset_random;
-		std::vector<std::uint32_t> orig_seeds;
+		std::vector<RandomEngineState> orig_state;
 };
 
 #endif

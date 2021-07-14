@@ -7,7 +7,6 @@
 #include "FWCore/PluginManager/interface/ModuleDef.h"
 #include "FWCore/Utilities/interface/RandomNumberGenerator.h"
 #include "FWCore/Utilities/interface/StreamID.h"
-#include "SimDataFormats/RandomEngine/interface/RandomEngineState.h"
 #include "SimG4Core/Watcher/interface/SimWatcherFactory.h"
 #include "SimG4Core/Notification/interface/BeginOfEvent.h"
 #include "SimG4Core/Notification/interface/BeginOfTrack.h"
@@ -88,21 +87,24 @@ void EcalStepWatcher::update(const BeginOfEvent* evt) {
 		//mockup of a stream ID: assume single thread
 		FakeStreamID fid(0);
 		edm::StreamID* sid(reinterpret_cast<edm::StreamID*>(&fid));
-		//make a copy of initial cache
-		if(orig_seeds.empty()) {
-			std::vector<RandomEngineState> cache = rng->getEventCache(*sid);
-			for(auto& state : cache){
-				if(state.getLabel() == "g4SimHits"){
-					//store original state
-					orig_seeds = state.getSeed();
-					break;
+		//make a copy of previous cache
+		std::vector<RandomEngineState> cache = rng->getEventCache(*sid);
+		for(auto& state : cache){
+			if(state.getLabel() == "g4SimHits"){
+				if(orig_state.empty()) {
+					orig_state.push_back(state);
 				}
+				auto seed_tmp = orig_state[0].getSeed();
+				//increment all seeds
+				std::for_each(seed_tmp.begin(), seed_tmp.end(), [](auto& n){ n++; });
+				orig_state[0].setSeed(seed_tmp);
+				//overwrite state (needed to set both seed and state for full reset)
+				state = orig_state[0];
+				break;
 			}
 		}
-		//increment all seeds
-		std::for_each(orig_seeds.begin(), orig_seeds.end(), [](auto& n){ n++; });
-		//reset G4 seed explicitly
-		G4Random::setTheSeed(orig_seeds[0]);
+		//force service to restore state from modified cache
+		rng->setEventCache(*sid,cache);
 	}
 
 	//try printing random numbers
