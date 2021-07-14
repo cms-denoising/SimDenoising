@@ -18,6 +18,7 @@
 #include "G4PrimaryVertex.hh"
 #include "G4SDManager.hh"
 #include "G4Step.hh"
+#include "Randomize.hh"
 
 //STL headers
 #include <algorithm>
@@ -91,14 +92,20 @@ void EcalStepWatcher::update(const BeginOfEvent* evt) {
 		//increment all seeds for relevant rng
 		for(auto& state : cache){
 			if(state.getLabel() == "g4SimHits"){
-				auto seed_tmp = state.getSeed();
-				std::for_each(seed_tmp.begin(), seed_tmp.end(), [](auto& n){ n++; });
-				state.setSeed(seed_tmp);
+				//store original state
+				if(orig_seeds.empty()) {
+					auto seed_tmp = state.getSeed();
+					orig_seeds = seed_tmp;
+				}
+				std::for_each(orig_seeds.begin(), orig_seeds.end(), [](auto& n){ n++; });
+				state.setSeed(orig_seeds);
 				break;
 			}
 		}
 		//force service to restore state from modified cache
-		rng->setEventCache(*sid,cache);
+		 rng->setEventCache(*sid,cache);
+		//make sure Geant4 uses this engine
+		G4Random::setTheEngine(&(rng->getEngine(*sid)));
 	}
 
 	//reset branches

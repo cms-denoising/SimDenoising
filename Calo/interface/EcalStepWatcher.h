@@ -59,6 +59,7 @@ class EcalStepWatcher : public SimWatcher,
 		int ymax;
 		bool image_only;
 		bool reset_random;
+		std::vector<std::uint32_t> orig_seeds;
 };
 
 #endif
