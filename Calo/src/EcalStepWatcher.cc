@@ -19,7 +19,6 @@
 #include "G4SDManager.hh"
 #include "G4Step.hh"
 #include "Randomize.hh"
-#include "CLHEP/Random/RandFlat.h"
 
 //STL headers
 #include <algorithm>
@@ -101,19 +100,9 @@ void EcalStepWatcher::update(const BeginOfEvent* evt) {
 		}
 		//increment all seeds
 		std::for_each(orig_seeds.begin(), orig_seeds.end(), [](auto& n){ n++; });
-		//reset G4 seed explicitly
+		//reset G4 seed explicitly (also resets state consistently)
 		G4Random::setTheSeed(orig_seeds[0]);
 	}
-
-	//try printing random numbers
-	FakeStreamID fid(0);
-	edm::StreamID* sid(reinterpret_cast<edm::StreamID*>(&fid));
-	edm::Service<edm::RandomNumberGenerator> rng;
-	auto state_tmp = G4Random::getTheEngine()->put();
-	std::cout << "state: ";
-	std::for_each(state_tmp.begin(), state_tmp.end(), [](auto n){ std::cout << n << ", "; });
-	std::cout << std::endl;
-	std::cout << "random (begin): " << CLHEP::RandFlat::shoot(&(rng->getEngine(*sid))) << ", " << CLHEP::RandFlat::shoot(G4Random::getTheEngine()) << std::endl;
 
 	//reset branches
 	entry_ = SimNtuple();
@@ -167,12 +156,6 @@ void EcalStepWatcher::update(const EndOfEvent* evt) {
 
 	//fill tree
 	tree_->Fill();	
-
-	//try printing random numbers
-	FakeStreamID fid(0);
-	edm::StreamID* sid(reinterpret_cast<edm::StreamID*>(&fid));
-	edm::Service<edm::RandomNumberGenerator> rng;
-	std::cout << "random (end): " << CLHEP::RandFlat::shoot(&(rng->getEngine(*sid))) << ", " << CLHEP::RandFlat::shoot(G4Random::getTheEngine()) << std::endl;
 }
 
 DEFINE_SIMWATCHER(EcalStepWatcher);
