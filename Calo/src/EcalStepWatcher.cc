@@ -88,26 +88,20 @@ void EcalStepWatcher::update(const BeginOfEvent* evt) {
 		//mockup of a stream ID: assume single thread
 		FakeStreamID fid(0);
 		edm::StreamID* sid(reinterpret_cast<edm::StreamID*>(&fid));
-		//make a copy of previous cache
-		std::vector<RandomEngineState> cache = rng->getEventCache(*sid);
-		//increment all seeds for relevant rng
-		for(auto& state : cache){
-			if(state.getLabel() == "g4SimHits"){
-				//store original state
-				if(orig_seeds.empty()) {
-					auto seed_tmp = state.getSeed();
-					orig_seeds = seed_tmp;
+		//make a copy of initial cache
+		if(orig_seeds.empty()) {
+			std::vector<RandomEngineState> cache = rng->getEventCache(*sid);
+			for(auto& state : cache){
+				if(state.getLabel() == "g4SimHits"){
+					//store original state
+					orig_seeds = state.getSeed();
+					break;
 				}
-				std::for_each(orig_seeds.begin(), orig_seeds.end(), [](auto& n){ n++; });
-				state.setSeed(orig_seeds);
-				break;
 			}
 		}
-		//force service to restore state from modified cache
-		 rng->setEventCache(*sid,cache);
-		//make sure Geant4 uses this engine
-		G4Random::setTheEngine(&(rng->getEngine(*sid)));
-		//also set the seed explicitly
+		//increment all seeds
+		std::for_each(orig_seeds.begin(), orig_seeds.end(), [](auto& n){ n++; });
+		//reset G4 seed explicitly
 		G4Random::setTheSeed(orig_seeds[0]);
 	}
 
