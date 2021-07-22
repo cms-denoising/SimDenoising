@@ -87,6 +87,6 @@ def resetSeeds(process,options):
     # reset all random numbers to ensure statistically distinct but reproducible jobs
     from IOMC.RandomEngine.RandomServiceHelper import RandomNumberServiceHelper
     randHelper = RandomNumberServiceHelper(process.RandomNumberGeneratorService)
-    randHelper.resetSeeds(options.maxEvents+options.part)
+    randHelper.resetSeeds(options.maxEvents*options.part+1)
     if process.source.type_()=='EmptySource' and options.part>0: process.source.firstEvent = cms.untracked.uint32((options.part-1)*options.maxEvents+1)
     return process

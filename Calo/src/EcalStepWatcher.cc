@@ -81,6 +81,12 @@ EcalStepWatcher::EcalStepWatcher(const edm::ParameterSet& iConfig)
 }
 
 void EcalStepWatcher::update(const BeginOfEvent* evt) {  
+	//reset branches
+	entry_ = SimNtuple();
+	if (image_only){
+		h2->Reset("ICESM");
+	}
+
 	//reset random number generator
 	if(reset_random){
 		edm::Service<edm::RandomNumberGenerator> rng;
@@ -94,20 +100,16 @@ void EcalStepWatcher::update(const BeginOfEvent* evt) {
 				if(state.getLabel() == "g4SimHits"){
 					//store original state
 					orig_seeds = state.getSeed();
-					break;
+					return; //don't need to increment for first event
 				}
 			}
 		}
-		//increment all seeds
-		std::for_each(orig_seeds.begin(), orig_seeds.end(), [](auto& n){ n++; });
-		//reset G4 seed explicitly (also resets state consistently)
-		G4Random::setTheSeed(orig_seeds[0]);
-	}
-
-	//reset branches
-	entry_ = SimNtuple();
-	if (image_only){
-		h2->Reset("ICESM");
+		else {
+			//increment all seeds
+			std::for_each(orig_seeds.begin(), orig_seeds.end(), [](auto& n){ n++; });
+			//reset G4 seed explicitly (also resets state consistently)
+			G4Random::setTheSeed(orig_seeds[0]);
+		}
 	}
 }
 
