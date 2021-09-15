@@ -57,7 +57,7 @@ class jobSubmitterSim(jobSubmitter):
 
         for iJob in xrange(int(self.nParts)):
             # get real part number
-            iActualJob = iJob+self.firstPart
+            iActualJob = iJob+int(self.firstPart)
             job.njobs += 1
             job.nums.append(iActualJob)
 
